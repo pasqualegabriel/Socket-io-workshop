@@ -44,8 +44,15 @@ const Chat = ({ location }) => {
       setUsers(users);
     });
 
-    socket.on("typing", (users) => {    
-      setTyping(users)
+    socket.on("typing", ({ name, value }) => {    
+      setTyping(writing => {
+        if(!value.length) {
+          return writing.filter(w => w.toLowerCase() !== name.toLowerCase())
+        }
+        const user = writing.find(w => w.toLowerCase() === name.toLowerCase())
+        if(!user) return [...writing, name]
+        return writing
+      })
     });
   }, []);
 
@@ -55,21 +62,17 @@ const Chat = ({ location }) => {
     if(message) {
       socket.emit('sendMessage', message, () => setMessage(''));
     }
-    socket.emit('stop:typing', { name, room })
+    socket.emit('typing', { name, room, value: '' })
   }
 
   const onTyping = (value) => {
     setMessage(value);
-    if(value) {
-      socket.emit('start:typing', { name, room })
-    } else {
-      socket.emit('stop:typing', { name, room })
-    }
+    socket.emit('typing', { name, room, value })
   }
 
   const whoIsTyping = () => {
-    const typingWithoutMe = typing.filter(user => user.name.toLowerCase() !== name.toLowerCase())
-    return typingWithoutMe.length ? typingWithoutMe.length === 1 ? `${typingWithoutMe[0].name} is typing` : `${typingWithoutMe.map(({name}) => name).join(', ')} are typing` : ''
+    const typingWithoutMe = typing.filter(user => user.toLowerCase() !== name.toLowerCase())
+    return typingWithoutMe.length ? typingWithoutMe.length === 1 ? `${typingWithoutMe[0]} is typing` : `${typingWithoutMe.join(', ')} are typing` : ''
   }
 
   return (

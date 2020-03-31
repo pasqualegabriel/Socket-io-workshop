@@ -3,7 +3,7 @@ const express = require('express');
 const socketio = require('socket.io');
 const cors = require('cors');
 
-const { addUser, removeUser, getUser, getUsersInRoom, typing, startTyping, stopTyping } = require('./users');
+const { addUser, removeUser, getUser, getUsersInRoom } = require('./users');
 
 const router = require('./router');
 
@@ -38,15 +38,13 @@ io.on('connect', (socket) => {
     callback();
   });
 
-  socket.on('start:typing', ({ room }) => {
-    startTyping(socket.id);
-    socket.broadcast.to(room).emit('typing', typing(room));
+  socket.on('typing', (data) => {
+    socket.broadcast.to(data.room).emit('typing', data);
   });
 
-  socket.on('stop:typing', ({ room }) => {
-    stopTyping(socket.id);
-    socket.broadcast.to(room).emit('typing', typing(room));
-  });
+  // socket.on('stop:typing', (data) => {
+  //   socket.broadcast.to(room).emit('typing', data);
+  // });
 
   socket.on('disconnect', () => {
     const user = removeUser(socket.id);
