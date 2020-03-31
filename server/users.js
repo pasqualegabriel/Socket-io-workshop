@@ -11,7 +11,7 @@ exports.addUser = ({ id, name, room }) => {
 
   if(existingUser) return { error: 'Username is taken.' };
 
-  const user = { id, name, room };
+  const user = { id, name, room, typing: false };
 
   users.push(user);
 
@@ -27,3 +27,15 @@ exports.removeUser = (id) => {
 exports.getUser = (id) => users.find((user) => user.id === id);
 
 exports.getUsersInRoom = (room) => users.filter((user) => user.room === room);
+
+exports.typing = (room) => users.filter((user) => user.room === room && user.typing);
+
+exports.startTyping = (id) => {
+  const index = users.findIndex((user) => user.id === id);
+  users[index].typing = true;
+};
+
+exports.stopTyping = (id) => {
+  const index = users.findIndex((user) => user.id === id);
+  users[index].typing = false;
+};

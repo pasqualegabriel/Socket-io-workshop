@@ -17,6 +17,7 @@ const Chat = ({ location }) => {
   const [users, setUsers] = useState('');
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
+  const [typing, setTyping] = useState([]);
   const ENDPOINT = 'http://localhost:8001';
 
   useEffect(() => {
@@ -42,7 +43,11 @@ const Chat = ({ location }) => {
     socket.on("roomData", ({ users }) => {
       setUsers(users);
     });
-}, []);
+
+    socket.on("typing", (users) => {    
+      setTyping(users)
+    });
+  }, []);
 
   const sendMessage = (event) => {
     event.preventDefault();
@@ -50,6 +55,21 @@ const Chat = ({ location }) => {
     if(message) {
       socket.emit('sendMessage', message, () => setMessage(''));
     }
+    socket.emit('stop:typing', { name, room })
+  }
+
+  const onTyping = (value) => {
+    setMessage(value);
+    if(value) {
+      socket.emit('start:typing', { name, room })
+    } else {
+      socket.emit('stop:typing', { name, room })
+    }
+  }
+
+  const whoIsTyping = () => {
+    const typingWithoutMe = typing.filter(user => user.name.toLowerCase() !== name.toLowerCase())
+    return typingWithoutMe.length ? typingWithoutMe.length === 1 ? `${typingWithoutMe[0].name} is typing` : `${typingWithoutMe.map(({name}) => name).join(', ')} are typing` : ''
   }
 
   return (
@@ -57,9 +77,10 @@ const Chat = ({ location }) => {
       <div className="container">
           <InfoBar room={room} />
           <Messages messages={messages} name={name} />
-          <Input message={message} setMessage={setMessage} sendMessage={sendMessage} />
+          <div id='typing'>{whoIsTyping()}</div>
+          <Input message={message} typing={onTyping} sendMessage={sendMessage} />
       </div>
-      <TextContainer users={users}/>
+      <TextContainer users={users} name={name}/>
     </div>
   );
 }

@@ -32,3 +32,8 @@
     width: 60%;
   }
 }
+
+#typing {
+  text-align: center;
+  color: gray;
+}
