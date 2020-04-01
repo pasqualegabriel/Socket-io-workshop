@@ -42,10 +42,6 @@ io.on('connect', (socket) => {
     socket.broadcast.to(data.room).emit('typing', data);
   });
 
-  // socket.on('stop:typing', (data) => {
-  //   socket.broadcast.to(room).emit('typing', data);
-  // });
-
   socket.on('disconnect', () => {
     const user = removeUser(socket.id);
 
