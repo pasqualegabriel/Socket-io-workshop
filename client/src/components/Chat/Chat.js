@@ -9,7 +9,8 @@ import Input from '../Input/Input';
 
 import './Chat.css';
 
-let socket;
+const ENDPOINT = 'http://localhost:8001';
+const socket = io(ENDPOINT);
 
 const Chat = ({ location }) => {
   const [name, setName] = useState('');
@@ -18,12 +19,9 @@ const Chat = ({ location }) => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [typing, setTyping] = useState([]);
-  const ENDPOINT = 'http://localhost:8001';
 
   useEffect(() => {
     const { name, room } = queryString.parse(location.search);
-
-    socket = io(ENDPOINT);
 
     setRoom(room);
     setName(name)
@@ -31,9 +29,10 @@ const Chat = ({ location }) => {
     socket.emit('join', { name, room }, (error) => {
       if(error) {
         alert(error);
+        window.location.pathname = '/'
       }
     });
-  }, [ENDPOINT, location.search]);
+  }, [location.search]);
   
   useEffect(() => {
     socket.on('message', message => {
@@ -45,13 +44,14 @@ const Chat = ({ location }) => {
     });
 
     socket.on("typing", ({ name, value }) => {    
-      setTyping(writing => {
+      setTyping(typing => {
+        name = name.toLowerCase()
         if(!value.length) {
-          return writing.filter(w => w.toLowerCase() !== name.toLowerCase())
+          return typing.filter(w => w.toLowerCase() !== name)
         }
-        const user = writing.find(w => w.toLowerCase() === name.toLowerCase())
-        if(!user) return [...writing, name]
-        return writing
+        const user = typing.find(w => w.toLowerCase() === name)
+        if(!user) return [...typing, name]
+        return typing
       })
     });
   }, []);

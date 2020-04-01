@@ -4,9 +4,6 @@ const users = [];
 exports.addUser = ({ id, name, room }) => {
   if(!name || !room) return { error: 'Username and room are required.' };
 
-  name = name.trim().toLowerCase();
-  room = room.trim().toLowerCase();
-
   const existingUser = users.find((user) => user.room === room && user.name === name);
 
   if(existingUser) return { error: 'Username is taken.' };
