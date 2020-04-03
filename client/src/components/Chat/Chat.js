@@ -70,17 +70,12 @@ const Chat = ({ location }) => {
     socket.emit('typing', { name, room, value })
   }
 
-  const whoIsTyping = () => {
-    const typingWithoutMe = typing.filter(user => user.toLowerCase() !== name.toLowerCase())
-    return typingWithoutMe.length ? typingWithoutMe.length === 1 ? `${typingWithoutMe[0]} is typing` : `${typingWithoutMe.join(', ')} are typing` : ''
-  }
-
   return (
     <div className="outerContainer">
       <div className="container">
           <InfoBar room={room} />
           <Messages messages={messages} name={name} />
-          <div id='typing'>{whoIsTyping()}</div>
+          <div id='typing'>{typing.length ? typing.length === 1 ? `${typing[0]} is typing` : `${typing.join(', ')} are typing` : ''}</div>
           <Input message={message} typing={onTyping} sendMessage={sendMessage} />
       </div>
       <TextContainer users={users} name={name}/>
