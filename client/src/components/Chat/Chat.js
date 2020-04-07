@@ -46,10 +46,10 @@ const Chat = ({ location }) => {
     socket.on("typing", ({ name, value }) => {    
       setTyping(typing => {
         name = name.toLowerCase()
-        if(!value.length) {
-          return typing.filter(w => w.toLowerCase() !== name)
+        if(!value) {
+          return typing.filter(userName => userName !== name)
         }
-        const user = typing.find(w => w.toLowerCase() === name)
+        const user = typing.find(userName => userName === name)
         if(!user) return [...typing, name]
         return typing
       })

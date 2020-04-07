@@ -13,6 +13,8 @@ const io = socketio(server);
 
 io.on('connect', (socket) => {
   socket.on('join', ({ name, room }, callback) => {
+		if(!name || !room) return callback({ error: 'Username and room are required.' });
+
     name = name.trim().toLowerCase();
     room = room.trim().toLowerCase();
 
@@ -32,9 +34,7 @@ io.on('connect', (socket) => {
 
   socket.on('sendMessage', (message, callback) => {
     const user = getUser(socket.id);
-
     io.to(user.room).emit('message', { user: user.name, text: message });
-
     callback();
   });
 
@@ -44,10 +44,12 @@ io.on('connect', (socket) => {
 
   socket.on('disconnect', () => {
     const user = removeUser(socket.id);
-
     if(user) {
-      io.to(user.room).emit('message', { user: 'Admin', text: `${user.name} has left.` });
-      io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room)});
+			const { name, room } = user
+			socket.leave(room)
+      io.to(room).emit('message', { user: 'Admin', text: `${name} has left.` });
+			io.to(room).emit('roomData', { room: room, users: getUsersInRoom(room) });
+			io.to(room).emit('typing', { name: name, room: room, value: '' });
     }
   });
 });
