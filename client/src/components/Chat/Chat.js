@@ -43,16 +43,13 @@ const Chat = ({ location }) => {
       setUsers(users);
     });
 
-    socket.on("typing", ({ name, value }) => {    
-      setTyping(typing => {
-        name = name.toLowerCase()
-        if(!value) {
-          return typing.filter(userName => userName !== name)
-        }
-        const user = typing.find(userName => userName === name)
-        if(!user) return [...typing, name]
-        return typing
-      })
+    socket.on("typing", ({ name, value }) => {
+      name = name.toLowerCase()
+      setTyping(typing => 
+        value
+          ? typing.includes(name) ? typing : [...typing, name]
+          : typing.filter(userName => userName !== name) 
+      )
     });
   }, []);
 
