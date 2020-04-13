@@ -47,8 +47,8 @@ io.on('connect', (socket) => {
 			const { name, room } = user;
 			socket.leave(room);
       io.to(room).emit('message', { user: 'Admin', text: `${name} has left.` });
-			io.to(room).emit('roomData', { room: room, users: getUsersInRoom(room) });
-			io.to(room).emit('typing', { name: name, room: room, value: '' });
+			io.to(room).emit('roomData', { room, users: getUsersInRoom(room) });
+			io.to(room).emit('typing', { name, room, value: '' });
     }
   });
 });
