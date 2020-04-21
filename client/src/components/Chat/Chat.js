@@ -63,7 +63,7 @@ const Chat = ({ location }) => {
     socket.emit('typing', { name, room, value: '' })
   }
 
-  const onTyping = (value) => {
+  const writing = (value) => {
     setMessage(value)
     socket.emit('typing', { name, room, value })
   }
@@ -74,7 +74,7 @@ const Chat = ({ location }) => {
           <InfoBar room={room} />
           <Messages messages={messages} name={name} />
           <Typing typing={typing} />
-          <Input message={message} typing={onTyping} sendMessage={sendMessage} />
+          <Input message={message} typing={writing} sendMessage={sendMessage} />
       </div>
       <TextContainer users={users} name={name}/>
     </div>

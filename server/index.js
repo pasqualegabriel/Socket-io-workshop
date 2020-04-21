@@ -28,13 +28,13 @@ io.on('connect', (socket) => {
 
     io.to(room).emit('roomData', { room: room, users: getUsersInRoom(room) });
 
-    callback();
+    return callback();
   });
 
   socket.on('sendMessage', (message, callback) => {
     const user = getUserById(socket.id);
     io.to(user.room).emit('message', { user: user.name, text: message });
-    callback();
+    return callback();
   });
 
   socket.on('typing', (data) => {
